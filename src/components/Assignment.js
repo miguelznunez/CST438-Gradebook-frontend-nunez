@@ -7,16 +7,17 @@ import Button from '@mui/material/Button';
 import Radio from '@mui/material/Radio';
 import {DataGrid} from '@mui/x-data-grid';
 import {SERVER_URL} from '../constants.js'
+import AddAssignment from './AddAssignment';
 
 // NOTE:  for OAuth security, http request must have
 //   credentials: 'include' 
 //
 
 class Assignment extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {selected: 0, assignments: []};
-    };
+  constructor(props) {
+    super(props);
+    this.state = {selected: 0, assignments: []};
+  };
  
    componentDidMount() {
     this.fetchAssignments();
@@ -48,6 +49,37 @@ class Assignment extends React.Component {
     console.log("Assignment.onRadioClick " + event.target.value);
     this.setState({selected: event.target.value});
   }
+
+  addAssignment = (assignment) => {
+    console.log(assignment);
+    const token = Cookies.get('XSRF-TOKEN');
+
+     fetch(`${SERVER_URL}/assignment/add`,
+      { 
+        method: 'PUT', 
+        headers: { 'Content-Type': 'application/json',
+                   'X-XSRF-TOKEN': token  }, 
+        body: JSON.stringify(assignment)
+      })
+    .then(res => {
+        if (res.ok) {
+          toast.success("Assignment successfully added", {
+              position: toast.POSITION.BOTTOM_LEFT
+          });
+          this.fetchAssignments();
+        } else {
+          toast.error("Error when adding", {
+              position: toast.POSITION.BOTTOM_LEFT
+          });
+          console.error('Post http status =' + res.status);
+        }})
+    .catch(err => {
+      toast.error("Error when adding", {
+            position: toast.POSITION.BOTTOM_LEFT
+        });
+        console.error(err);
+    })
+  }
   
   render() {
      const columns = [
@@ -58,7 +90,7 @@ class Assignment extends React.Component {
         renderCell: (params) => (
           <div>
           <Radio
-            checked={params.row.id == this.state.selected}
+            checked={params.row.id === this.state.selected}
             onChange={this.onRadioClick}
             value={params.row.id}
             color="default"
@@ -82,7 +114,10 @@ class Assignment extends React.Component {
             <Button component={Link} to={{pathname:'/gradebook',   assignment: assignmentSelected }} 
                     variant="outlined" color="primary" disabled={this.state.assignments.length===0}  style={{margin: 10}}>
               Grade
-            </Button>
+            </Button> 
+            
+            <AddAssignment addAssignment={this.addAssignment}  />
+
             <ToastContainer autoClose={1500} /> 
           </div>
       )

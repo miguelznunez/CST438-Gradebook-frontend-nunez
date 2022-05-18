@@ -131,15 +131,24 @@ class Gradebook extends React.Component {
         return(
             <div className="App">
               <Grid container>
+
+                {/* SECOND HEADER */}
+
                 <Grid item align="left">
                    <h4>Assignment: {assignment.assignmentName}</h4>
                    <h4>Course: {assignment.courseTitle}</h4>                   
                 </Grid>
               </Grid>
+
+              {/* JSON WITH RETURNED DATABASE DATA */}
+
               <div style={{width:'100%'}}>
                 For DEBUG:  display state.
                 {JSON.stringify(this.state)}
               </div>
+
+              {/* ROWS WITH DATA DATABASE DATA */}
+
               <div style={{ height: 400, width: '100%' }}>
                 <DataGrid rows={this.state.grades} columns={columns} onCellEditCommit={this.handleCellEditCommit}  />
                 <Button variant="outlined" color="primary" style={{margin: 10}} onClick={this.handleSubmit} >
